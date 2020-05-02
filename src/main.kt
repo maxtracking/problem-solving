@@ -21,8 +21,9 @@ fun climbingLeaderboardTask() {
     val alice = scan.nextLine().split(" ").map{ it.trim().toInt() }.toTypedArray()
 
     val result = climbingLeaderboard(scores, alice)
-
     println(result.joinToString("\n"))
+    val result2 = climbingLeaderboardDescending(scores, alice)
+    println(result2.joinToString("\n"))
 }
 
 fun climbingLeaderboard(scores: Array<Int>, alice: Array<Int>): Array<Int> {
@@ -40,7 +41,7 @@ fun climbingLeaderboard(scores: Array<Int>, alice: Array<Int>): Array<Int> {
 
     for (i in alice.indices) {
         val score = alice[i]
-        val idx = arr.binarySearch(score)
+        val idx = binarySearchAscending(arr.toTypedArray(), 0, arr.size, score)//arr.binarySearch(score)
         if (idx < 0) {
             aliceRanks[i] = lowestRank + 1 + idx
         } else {
@@ -49,6 +50,53 @@ fun climbingLeaderboard(scores: Array<Int>, alice: Array<Int>): Array<Int> {
     }
 
     return aliceRanks
+}
+
+fun binarySearchAscending(a: Array<Int>, fromIndex: Int, toIndex: Int, key: Int): Int {
+    var low = fromIndex
+    var high = toIndex - 1
+    while (low <= high) {
+        val mid = low + high ushr 1
+        val midVal = a[mid]
+        val cmp = midVal.compareTo(key)
+        if (cmp < 0) low = mid + 1 else if (cmp > 0) high = mid - 1 else return mid // key found
+    }
+    return -(low + 1) // key not found.
+}
+
+fun climbingLeaderboardDescending(scores: Array<Int>, alice: Array<Int>): Array<Int> {
+    val aliceRanks = Array(alice.size) { -1 }
+    val arr = ArrayList<Int>()
+    arr.add(scores[0])
+    for (i in 1 until scores.size) {
+        if (scores[i] < arr.last()) {
+            arr.add(scores[i])
+        }
+    }
+
+    for (i in alice.indices) {
+        val score = alice[i]
+        val idx = binarySearchDescending(arr.toTypedArray(), 0, arr.size, score)//arr.binarySearch(score)
+        if (idx < 0) {
+            aliceRanks[i] = -idx
+        } else {
+            aliceRanks[i] = idx + 1
+        }
+    }
+
+    return aliceRanks
+}
+
+fun binarySearchDescending(a: Array<Int>, fromIndex: Int, toIndex: Int, key: Int): Int {
+    var low = fromIndex
+    var high = toIndex - 1
+    while (low <= high) {
+        val mid = low + high ushr 1
+        val midVal = a[mid]
+        val cmp = midVal.compareTo(key)
+        if (cmp < 0) high = mid - 1 else if (cmp > 0) low = mid + 1 else return mid // key found
+    }
+    return -(low + 1) // key not found.
 }
 
 fun pickingNumbersTask() {
